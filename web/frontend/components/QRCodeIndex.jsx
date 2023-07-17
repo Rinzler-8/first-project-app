@@ -1,9 +1,9 @@
 import { useNavigate } from "@shopify/app-bridge-react";
 import {
-  Card,
+  LegacyCard,
   Icon,
   IndexTable,
-  Stack,
+  LegacyStack,
   TextStyle,
   Thumbnail,
   UnstyledLink,
@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 
 /* Markup for small screen sizes (mobile) */
 function SmallScreenCard({
-  id,
+  _id,
   title,
   product,
   discountCode,
@@ -27,22 +27,22 @@ function SmallScreenCard({
   navigate,
 }) {
   return (
-    <UnstyledLink onClick={() => navigate(`/qrcodes/${id}`)}>
+    <UnstyledLink onClick={() => navigate(`/qrcodes/${_id}`)}>
       <div
         style={{ padding: "0.75rem 1rem", borderBottom: "1px solid #E1E3E5" }}
       >
-        <Stack>
-          <Stack.Item>
+        <LegacyStack>
+          <LegacyStack.Item>
             <Thumbnail
               source={product?.images?.edges[0]?.node?.url || ImageMajor}
               alt="placeholder"
               color="base"
               size="small"
             />
-          </Stack.Item>
-          <Stack.Item fill>
-            <Stack vertical={true}>
-              <Stack.Item>
+          </LegacyStack.Item>
+          <LegacyStack.Item fill>
+            <LegacyStack vertical={true}>
+              <LegacyStack.Item>
                 <p>
                   <TextStyle variation="strong">
                     {truncate(title, 35)}
@@ -50,7 +50,7 @@ function SmallScreenCard({
                 </p>
                 <p>{truncate(product?.title, 35)}</p>
                 <p>{dayjs(createdAt).format("MMMM D, YYYY")}</p>
-              </Stack.Item>
+              </LegacyStack.Item>
               <div style={{ display: "flex" }}>
                 <div style={{ flex: "3" }}>
                   <TextStyle variation="subdued">Discount</TextStyle>
@@ -61,9 +61,9 @@ function SmallScreenCard({
                   <p>{scans}</p>
                 </div>
               </div>
-            </Stack>
-          </Stack.Item>
-        </Stack>
+            </LegacyStack>
+          </LegacyStack.Item>
+        </LegacyStack>
       </div>
     </UnstyledLink>
   );
@@ -77,7 +77,7 @@ export function QRCodeIndex({ QRCodes, loading }) {
 
   /* Map over QRCodes for small screen */
   const smallScreenMarkup = QRCodes.map((QRCode) => (
-    <SmallScreenCard key={QRCode.id} navigate={navigate} {...QRCode} />
+    <SmallScreenCard key={QRCode._id} navigate={navigate} {...QRCode} />
   ));
 
   const resourceName = {
@@ -86,17 +86,17 @@ export function QRCodeIndex({ QRCodes, loading }) {
   };
 
   const rowMarkup = QRCodes.map(
-    ({ id, title, product, discountCode, scans, createdAt }, index) => {
+    ({ _id, title, product, discountCode, scans, createdAt }, index) => {
       const deletedProduct = product.title.includes("Deleted product");
 
       /* The form layout, created using Polaris components. Includes the QR code data set above. */
       return (
         <IndexTable.Row
-          id={id}
-          key={id}
+          id={_id}
+          key={_id}
           position={index}
           onClick={() => {
-            navigate(`/qrcodes/${id}`);
+            navigate(`/qrcodes/${_id}`);
           }}
         >
           <IndexTable.Cell>
@@ -108,19 +108,19 @@ export function QRCodeIndex({ QRCodes, loading }) {
             />
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <UnstyledLink data-primary-link url={`/qrcodes/${id}`}>
+            <UnstyledLink data-primary-link url={`/qrcodes/${_id}`}>
               {truncate(title, 25)}
             </UnstyledLink>
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <Stack>
+            <LegacyStack>
               {deletedProduct && (
                 <Icon source={DiamondAlertMajor} color="critical" />
               )}
               <TextStyle variation={deletedProduct ? "negative" : null}>
                 {truncate(product?.title, 25)}
               </TextStyle>
-            </Stack>
+            </LegacyStack>
           </IndexTable.Cell>
           <IndexTable.Cell>{discountCode}</IndexTable.Cell>
           <IndexTable.Cell>
@@ -134,7 +134,7 @@ export function QRCodeIndex({ QRCodes, loading }) {
 
   /* A layout for small screens, built using Polaris components */
   return (
-    <Card>
+    <LegacyCard>
       {isSmallScreen ? (
         smallScreenMarkup
       ) : (
@@ -155,7 +155,7 @@ export function QRCodeIndex({ QRCodes, loading }) {
           {rowMarkup}
         </IndexTable>
       )}
-    </Card>
+    </LegacyCard>
   );
 }
 

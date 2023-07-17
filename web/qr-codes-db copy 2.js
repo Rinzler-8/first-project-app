@@ -55,6 +55,15 @@ export const QRCodesDB = {
     return result.insertedId;
   },
 
+  read: async function (id) {
+    await this.ready;
+
+    const query = { _id: new ObjectId(id) };
+    const qrcode = await this.db.findOne(query);
+
+    return qrcode ? this.__addImageUrl(qrcode) : undefined;
+  },
+
   update: async function (
     id,
     {
@@ -69,7 +78,7 @@ export const QRCodesDB = {
   ) {
     await this.ready;
 
-    const query = { _id: ObjectId(id) };
+    const query = { _id: new ObjectId(id) };
     const updateDocument = {
       $set: {
         title,
@@ -95,19 +104,10 @@ export const QRCodesDB = {
     return results.map((qrcode) => this.__addImageUrl(qrcode));
   },
 
-  read: async function (id) {
-    await this.ready;
-
-    const query = { _id: ObjectId(id) };
-    const qrcode = await this.db.findOne(query);
-
-    return qrcode ? this.__addImageUrl(qrcode) : undefined;
-  },
-
   delete: async function (id) {
     await this.ready;
 
-    const query = { _id: ObjectId(id) };
+    const query = { _id: new ObjectId(id) };
     await this.db.deleteOne(query);
     return true;
   },
@@ -182,7 +182,7 @@ export const QRCodesDB = {
   },
 
   __generateQrcodeImageUrl: function (qrcode) {
-    return `${shopify.api.config.hostScheme}://${shopify.api.config.hostName}/qrcodes/${qrcode.id}/image`;
+    return `${shopify.api.config.hostScheme}://${shopify.api.config.hostName}/qrcodes/${qrcode._id}/image`;
   },
 
   __increaseScanCount: async function (qrcode) {

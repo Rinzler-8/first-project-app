@@ -18,7 +18,7 @@ The Node app template comes with the following out-of-the-box functionality:
   - Polaris
   - Webhooks
 
-## Tech Stack
+## Tech LegacyStack
 
 This template combines a number of third party open-source tools:
 

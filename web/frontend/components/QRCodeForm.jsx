@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import {
   Banner,
-  Card,
+  LegacyCard,
   Form,
   FormLayout,
   TextField,
@@ -10,7 +10,7 @@ import {
   Select,
   Thumbnail,
   Icon,
-  Stack,
+  LegacyStack,
   TextStyle,
   Layout,
   EmptyState,
@@ -50,7 +50,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
       (async () => {
         const parsedBody = body;
         parsedBody.destination = parsedBody.destination[0];
-        const QRCodeId = QRCode?.id;
+        const QRCodeId = QRCode?._id;
         /* construct the appropriate URL to send the API request to based on whether the QR code is new or being updated */
         const url = QRCodeId ? `/api/qrcodes/${QRCodeId}` : "/api/qrcodes";
         /* a condition to select the appropriate HTTP method: PATCH to update a QR code or POST to create a new QR code */
@@ -64,9 +64,10 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
         if (response.ok) {
           makeClean();
           const QRCode = await response.json();
+          console.log("QRCode ", QRCode);
           /* if this is a new QR code, then save the QR code and navigate to the edit page; this behavior is the standard when saving resources in the Shopify admin */
           if (!QRCodeId) {
-            navigate(`/qrcodes/${QRCode.id}`);
+            navigate(`/qrcodes/${QRCode._id}`);
             /* if this is a QR code update, update the QR code state in this component */
           } else {
             setQRCode(QRCode);
@@ -124,9 +125,9 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
   });
 
   const QRCodeURL = QRCode
-    ? new URL(`/qrcodes/${QRCode.id}/image`, location.toString()).toString()
+    ? new URL(`/qrcodes/${QRCode._id}/image`, location.toString()).toString()
     : null;
-
+  console.log("QRCodeURL ", QRCodeURL);
   /*
     This function is called with the selected product whenever the user clicks "Add" in the ResourcePicker.
 
@@ -171,7 +172,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
     reset();
     /* The isDeleting state disables the download button and the delete QR code button to show the user that an action is in progress */
     setIsDeleting(true);
-    const response = await fetch(`/api/qrcodes/${QRCode.id}`, {
+    const response = await fetch(`/api/qrcodes/${QRCode._id}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
@@ -247,7 +248,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
 
   /* The form layout, created using Polaris and App Bridge components. */
   return (
-    <Stack vertical>
+    <LegacyStack vertical>
       {deletedProduct && (
         <Banner
           title="The product for this QR code no longer exists."
@@ -279,16 +280,16 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
               fullWidth
             />
             <FormLayout>
-              <Card sectioned title="Title">
+              <LegacyCard sectioned title="Title">
                 <TextField
                   {...title}
                   label="Title"
                   labelHidden
                   helpText="Only store staff can see this title"
                 />
-              </Card>
+              </LegacyCard>
 
-              <Card
+              <LegacyCard
                 title="Product"
                 actions={[
                   {
@@ -299,7 +300,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                   },
                 ]}
               >
-                <Card.Section>
+                <LegacyCard.Section>
                   {showResourcePicker && (
                     <ResourcePicker
                       resourceType="Product"
@@ -311,7 +312,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                     />
                   )}
                   {productId.value ? (
-                    <Stack alignment="center">
+                    <LegacyStack alignment="center">
                       {imageSrc || originalImageSrc ? (
                         <Thumbnail
                           source={imageSrc || originalImageSrc}
@@ -327,24 +328,24 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                       <TextStyle variation="strong">
                         {selectedProduct.title}
                       </TextStyle>
-                    </Stack>
+                    </LegacyStack>
                   ) : (
-                    <Stack vertical spacing="extraTight">
+                    <LegacyStack vertical spacing="extraTight">
                       <Button onClick={toggleResourcePicker}>
                         Select product
                       </Button>
                       {productId.error && (
-                        <Stack spacing="tight">
+                        <LegacyStack spacing="tight">
                           <Icon source={AlertMinor} color="critical" />
                           <TextStyle variation="negative">
                             {productId.error}
                           </TextStyle>
-                        </Stack>
+                        </LegacyStack>
                       )}
-                    </Stack>
+                    </LegacyStack>
                   )}
-                </Card.Section>
-                <Card.Section title="Scan Destination">
+                </LegacyCard.Section>
+                <LegacyCard.Section title="Scan Destination">
                   <ChoiceList
                     title="Scan destination"
                     titleHidden
@@ -358,9 +359,9 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                     selected={destination.value}
                     onChange={destination.onChange}
                   />
-                </Card.Section>
-              </Card>
-              <Card
+                </LegacyCard.Section>
+              </LegacyCard>
+              <LegacyCard
                 sectioned
                 title="Discount"
                 actions={[
@@ -387,12 +388,12 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                   disabled={isLoadingShopData || shopDataError}
                   labelHidden
                 />
-              </Card>
+              </LegacyCard>
             </FormLayout>
           </Form>
         </Layout.Section>
         <Layout.Section secondary>
-          <Card sectioned title="QR code">
+          <LegacyCard sectioned title="QR code">
             {QRCode ? (
               <EmptyState imageContained={true} image={QRCodeURL} />
             ) : (
@@ -400,7 +401,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                 <p>Your QR code will appear here after you save.</p>
               </EmptyState>
             )}
-            <Stack vertical>
+            <LegacyStack vertical>
               <Button
                 fullWidth
                 primary
@@ -417,11 +418,11 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
               >
                 Go to destination
               </Button>
-            </Stack>
-          </Card>
+            </LegacyStack>
+          </LegacyCard>
         </Layout.Section>
         <Layout.Section>
-          {QRCode?.id && (
+          {QRCode?._id && (
             <Button
               outline
               destructive
@@ -433,7 +434,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
           )}
         </Layout.Section>
       </Layout>
-    </Stack>
+    </LegacyStack>
   );
 }
 

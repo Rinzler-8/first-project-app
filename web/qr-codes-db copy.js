@@ -43,7 +43,6 @@ export const QRCodesDB = {
       discountCode,
       destination,
     ]);
-
     return rawResults[0].id;
   },
 
