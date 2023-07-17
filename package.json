@@ -13,7 +13,9 @@
   },
   "dependencies": {
     "@shopify/app": "3.47.5",
-    "@shopify/cli": "^3.47.5"
+    "@shopify/cli": "^3.47.5",
+    "@shopify/polaris": "^11.6.0",
+    "@shopify/polaris-tokens": "^7.5.1"
   },
   "author": "admin",
   "private": true,
