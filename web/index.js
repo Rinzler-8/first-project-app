@@ -23,7 +23,14 @@ const STATIC_PATH =
 const app = express();
 
 // Set up Shopify authentication and webhook handling
-app.get(shopify.config.auth.path, shopify.auth.begin());
+app.get(
+  shopify.config.auth.path,
+  (req, res, next) => {
+    console.log("begin auth");
+    next();
+  },
+  shopify.auth.begin()
+);
 app.get(
   shopify.config.auth.callbackPath,
   shopify.auth.callback(),

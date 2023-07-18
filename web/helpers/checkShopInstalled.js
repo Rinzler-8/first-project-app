@@ -3,10 +3,11 @@ import { ShopInfoDB } from "../qr-codes-db.js";
 export const checkShopInstalled = async (req, res, next) => {
   try {
     const shop = req.query.shop;
-    const shops = await ShopInfoDB.list(); // Get all shop domains from the database
+    const shops = await ShopInfoDB.list();
+    // Check if the shop already exists in the shops array
+    const shopExists = shops.some((item) => item.shopDomain === shop);
 
-    if (!shops.includes(shop)) {
-      // If the shop domain does not exist in the database, create it
+    if (!shopExists) {
       await ShopInfoDB.create({ shopDomain: shop });
     }
 
