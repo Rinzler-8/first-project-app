@@ -64,7 +64,6 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
         if (response.ok) {
           makeClean();
           const QRCode = await response.json();
-          console.log("QRCode ", QRCode);
           /* if this is a new QR code, then save the QR code and navigate to the edit page; this behavior is the standard when saving resources in the Shopify admin */
           if (!QRCodeId) {
             navigate(`/qrcodes/${QRCode._id}`);

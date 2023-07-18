@@ -9,22 +9,57 @@ import shopify from "./shopify.js";
 const uri = "mongodb://localhost:27017"; // Replace with your MongoDB URI
 const client = new MongoClient(uri);
 const DEFAULT_PURCHASE_QUANTITY = 1;
+let db;
 
 async function connectToDB() {
   try {
     await client.connect();
     console.log("Connected to MongoDB!");
-    QRCodesDB.ready = Promise.resolve();
-    return client.db("qr_db").collection("qr_codes"); // Return the 'qr_codes' collection directly
+    db = client.db("qr_db");
+    const collections = {
+      qrCodesCollection: db.collection("qr_codes"),
+      shopInfoCollection: db.collection("shop_info"),
+      // Add more collections as needed
+    };
+    return collections;
   } catch (err) {
     console.error("Error connecting to MongoDB:", err);
   }
 }
 
+let connect = await connectToDB();
+
+export const ShopInfoDB = {
+  shopInfoTableName: "shop_info",
+  shopInfoCollection: connect.shopInfoCollection,
+  db: null,
+
+  create: async function ({ shopDomain }) {
+    await this.ready;
+
+    const document = {
+      shopDomain,
+    };
+
+    const result = await this.shopInfoCollection.insertOne(document);
+    return result.insertedId;
+  },
+
+  read: async function (id) {
+    await this.ready;
+
+    const query = { _id: new ObjectId(id) };
+    const qrcode = await this.shopInfoCollection.findOne(query);
+
+    return qrcode ? this.__addImageUrl(qrcode) : undefined;
+  },
+};
+
 export const QRCodesDB = {
   qrCodesTableName: "qr_codes",
   db: null,
   ready: null,
+  qrCodesCollection: connect.qrCodesCollection,
 
   create: async function ({
     shopDomain,
@@ -51,7 +86,7 @@ export const QRCodesDB = {
       createdAt: new Date(),
     };
 
-    const result = await this.db.insertOne(document);
+    const result = await this.qrCodesCollection.insertOne(document);
     return result.insertedId;
   },
 
@@ -59,7 +94,7 @@ export const QRCodesDB = {
     await this.ready;
 
     const query = { _id: new ObjectId(id) };
-    const qrcode = await this.db.findOne(query);
+    const qrcode = await this.qrCodesCollection.findOne(query);
 
     return qrcode ? this.__addImageUrl(qrcode) : undefined;
   },
@@ -91,7 +126,7 @@ export const QRCodesDB = {
       },
     };
 
-    await this.db.updateOne(query, updateDocument);
+    await this.qrCodesCollection.updateOne(query, updateDocument);
     return true;
   },
 
@@ -99,7 +134,7 @@ export const QRCodesDB = {
     await this.ready;
 
     const query = { shopDomain };
-    const results = await this.db.find(query).toArray();
+    const results = await this.qrCodesCollection.find(query).toArray();
 
     return results.map((qrcode) => this.__addImageUrl(qrcode));
   },
@@ -108,7 +143,7 @@ export const QRCodesDB = {
     await this.ready;
 
     const query = { _id: new ObjectId(id) };
-    await this.db.deleteOne(query);
+    await this.qrCodesCollection.deleteOne(query);
     return true;
   },
 
@@ -145,7 +180,7 @@ export const QRCodesDB = {
   */
 
   __hasQrCodesCollection: async function () {
-    const collections = await this.db
+    const collections = await db
       .listCollections({ name: this.qrCodesTableName })
       .toArray();
     return collections.length > 0;
@@ -154,6 +189,7 @@ export const QRCodesDB = {
   init: async function () {
     try {
       this.db = await connectToDB(); // Initialize the db property with the connected database
+      this.ready = Promise.resolve();
 
       const hasQrCodesCollection = await this.__hasQrCodesCollection();
 
@@ -162,9 +198,10 @@ export const QRCodesDB = {
           { key: { shopDomain: 1 } },
           { key: { createdAt: 1 }, expireAfterSeconds: 86400 }, // Auto-delete documents after 24 hours
         ];
-
         await this.db.createCollection(this.qrCodesTableName);
         await this.db.createIndexes(this.qrCodesTableName, indexes);
+        await this.db.createCollection(this.shopInfoTableName);
+        await this.db.createIndexes(this.shopInfoTableName, indexes);
       }
     } catch (err) {
       console.error("Error initializing MongoDB:", err);
