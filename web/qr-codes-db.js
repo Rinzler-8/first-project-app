@@ -32,7 +32,6 @@ let connect = await connectToDB();
 export const ShopInfoDB = {
   shopInfoTableName: "shop_info",
   shopInfoCollection: connect.shopInfoCollection,
-  db: null,
 
   create: async function ({ shopDomain }) {
     await this.ready;
@@ -49,9 +48,16 @@ export const ShopInfoDB = {
     await this.ready;
 
     const query = { _id: new ObjectId(id) };
-    const qrcode = await this.shopInfoCollection.findOne(query);
+    const shop = await this.shopInfoCollection.findOne(query);
 
-    return qrcode ? this.__addImageUrl(qrcode) : undefined;
+    return shop;
+  },
+
+  list: async function () {
+    await this.ready;
+    const results = await this.shopInfoCollection.find().toArray();
+
+    return results;
   },
 };
 
@@ -95,7 +101,6 @@ export const QRCodesDB = {
 
     const query = { _id: new ObjectId(id) };
     const qrcode = await this.qrCodesCollection.findOne(query);
-
     return qrcode ? this.__addImageUrl(qrcode) : undefined;
   },
 
@@ -154,21 +159,30 @@ export const QRCodesDB = {
 
   /* The behavior when a QR code is scanned */
   handleCodeScan: async function (qrcode) {
+    if (!qrcode.shopDomain) {
+      throw "Missing host query argument";
+    }
+
     /* Log the scan in the database */
     await this.__increaseScanCount(qrcode);
 
-    const url = new URL(qrcode.shopDomain);
-    switch (qrcode.destination) {
-      /* The QR code redirects to the product view */
-      case "product":
-        return this.__goToProductView(url, qrcode);
+    try {
+      const url = new URL(qrcode.shopDomain);
+      switch (qrcode.destination) {
+        /* The QR code redirects to the product view */
+        case "product":
+          return this.__goToProductView(url, qrcode);
 
-      /* The QR code redirects to checkout */
-      case "checkout":
-        return this.__goToProductCheckout(url, qrcode);
+        /* The QR code redirects to checkout */
+        case "checkout":
+          return this.__goToProductCheckout(url, qrcode);
 
-      default:
-        throw `Unrecognized destination "${qrcode.destination}"`;
+        default:
+          throw `Unrecognized destination "${qrcode.destination}"`;
+      }
+    } catch (error) {
+      console.error("Error handling code scan:", error);
+      throw error;
     }
   },
 
@@ -188,7 +202,6 @@ export const QRCodesDB = {
 
   init: async function () {
     try {
-      this.db = await connectToDB(); // Initialize the db property with the connected database
       this.ready = Promise.resolve();
 
       const hasQrCodesCollection = await this.__hasQrCodesCollection();
@@ -198,10 +211,10 @@ export const QRCodesDB = {
           { key: { shopDomain: 1 } },
           { key: { createdAt: 1 }, expireAfterSeconds: 86400 }, // Auto-delete documents after 24 hours
         ];
-        await this.db.createCollection(this.qrCodesTableName);
-        await this.db.createIndexes(this.qrCodesTableName, indexes);
-        await this.db.createCollection(this.shopInfoTableName);
-        await this.db.createIndexes(this.shopInfoTableName, indexes);
+        await connect.createCollection(this.qrCodesTableName);
+        await connect.createIndexes(this.qrCodesTableName, indexes);
+        await connect.createCollection(this.shopInfoTableName);
+        await connect.createIndexes(this.shopInfoTableName, indexes);
       }
     } catch (err) {
       console.error("Error initializing MongoDB:", err);

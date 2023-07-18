@@ -8,6 +8,7 @@ import shopify from "./shopify.js";
 import applyQrCodeApiEndpoints from "./middleware/qr-code-api.js";
 import applyQrCodePublicEndpoints from "./middleware/qr-code-public.js";
 import GDPRWebhookHandlers from "./gdpr.js";
+import { checkShopInstalled } from "./helpers/checkShopInstalled.js";
 
 const PORT = parseInt(
   process.env.BACKEND_PORT || process.env.PORT || "3000",
@@ -36,6 +37,7 @@ app.post(
 // If you are adding routes outside of the /api path, remember to
 // also add a proxy rule for them in web/frontend/vite.config.js
 applyQrCodePublicEndpoints(app);
+
 app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
@@ -45,11 +47,16 @@ applyQrCodeApiEndpoints(app);
 app.use(shopify.cspHeaders());
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
-app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
-  return res
-    .status(200)
-    .set("Content-Type", "text/html")
-    .send(readFileSync(join(STATIC_PATH, "index.html")));
-});
+app.use(
+  "/*",
+  shopify.ensureInstalledOnShop(),
+  checkShopInstalled,
+  async (_req, res, _next) => {
+    return res
+      .status(200)
+      .set("Content-Type", "text/html")
+      .send(readFileSync(join(STATIC_PATH, "index.html")));
+  }
+);
 
 app.listen(PORT);

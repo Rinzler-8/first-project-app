@@ -15,7 +15,6 @@ export default function applyQrCodePublicEndpoints(app) {
   */
   app.get("/qrcodes/:id/image", async (req, res) => {
     const qrcode = await getQrCodeOr404(req, res, false);
-
     if (qrcode) {
       const destinationUrl = QRCodesDB.generateQrcodeDestinationUrl(qrcode);
       res
@@ -23,7 +22,7 @@ export default function applyQrCodePublicEndpoints(app) {
         .set("Content-Type", "image/png")
         .set(
           "Content-Disposition",
-          `inline; filename="qr_code_${qrcode.id}.png"`
+          `inline; filename="qr_code_${qrcode._id}.png"`
         )
         .send(await QRCode.toBuffer(destinationUrl));
     }
