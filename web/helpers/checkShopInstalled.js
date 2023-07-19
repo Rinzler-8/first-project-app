@@ -1,6 +1,6 @@
 import { ShopInfoDB } from "../qr-codes-db.js";
-import shopify from "../shopify.js";
 import { MongoDBSessionStorage } from "@shopify/shopify-app-session-storage-mongodb";
+import shopify from "../shopify.js";
 
 export const checkShopInstalled = async (req, res, next) => {
   try {
@@ -8,39 +8,32 @@ export const checkShopInstalled = async (req, res, next) => {
     const shops = await ShopInfoDB.list();
     const DB_PATH = `mongodb://localhost:27017`;
     const mongoDBSessionStorage = new MongoDBSessionStorage(DB_PATH);
-    const shopSession = await mongoDBSessionStorage.findSessionsByShop(shop);
-    const session = shopSession[0];
+    const session = await mongoDBSessionStorage.findSessionsByShop(shop);
+
+    if (!session[0]) {
+      throw new Error("Shop session not found.");
+    }
+
     const shopConfig = await shopify.api.rest.Shop.all({
-      session: session,
+      session: session[0],
     });
-    const shopInfo = shopConfig.data[0];
-    const shopOwner = shopInfo.email;
-    const shopName = shopInfo.name;
-    const shopCountry = shopInfo.country;
-    const shopPhone = shopInfo.phone;
 
-    console.log("shopPhone ", shopPhone);
+    const { name, email: owner, country, phone } = shopConfig.data[0];
 
-    // Check if the shop already exists in the shops array
-    // const shopExists = shops.some((item) => item.shopDomain === shop);
+    const shopInfo = {
+      shopDomain: shop,
+      name,
+      owner,
+      country,
+      phone,
+    };
+
     const shopExists = shops.find((item) => item.shopDomain === shop);
 
     if (!shopExists) {
-      await ShopInfoDB.create({
-        shopDomain: shop,
-        name: shopName,
-        owner: shopOwner,
-        country: shopCountry,
-        phone: shopPhone,
-      });
+      await ShopInfoDB.create(shopInfo);
     } else {
-      await ShopInfoDB.update(shopExists._id, {
-        shopDomain: shop,
-        name: shopName,
-        owner: shopOwner,
-        country: shopCountry,
-        phone: shopPhone,
-      });
+      await ShopInfoDB.update(shopExists._id, shopInfo);
     }
 
     await next();
