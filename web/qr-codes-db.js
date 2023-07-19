@@ -33,11 +33,15 @@ export const ShopInfoDB = {
   shopInfoTableName: "shop_info",
   shopInfoCollection: connect.shopInfoCollection,
 
-  create: async function ({ shopDomain }) {
+  create: async function ({ shopDomain, name, country, phone, owner }) {
     await this.ready;
 
     const document = {
       shopDomain,
+      name,
+      country,
+      phone,
+      owner,
     };
 
     const result = await this.shopInfoCollection.insertOne(document);
@@ -60,13 +64,17 @@ export const ShopInfoDB = {
     return results;
   },
 
-  update: async function (id, { _id }) {
+  update: async function (id, { shopDomain, name, country, phone, owner }) {
     await this.ready;
 
     const query = { _id: new ObjectId(id) };
     const updateDocument = {
       $set: {
-        _id,
+        shopDomain,
+        name,
+        country,
+        phone,
+        owner,
       },
     };
 

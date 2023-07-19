@@ -1,5 +1,5 @@
 import { ShopInfoDB } from "../qr-codes-db.js";
-import shopify from "@shopify/shopify-api";
+import shopify from "../shopify.js";
 import { MongoDBSessionStorage } from "@shopify/shopify-app-session-storage-mongodb";
 import fetch from "node-fetch";
 
@@ -22,7 +22,6 @@ export const checkShopInstalled = async (req, res, next) => {
     });
     const data = await response.json(); // Get JSON data from the response
 
-    console.log("res1 ", data);
     // Check if the shop already exists in the shops array
     const shopExists = shops.some((item) => item.shopDomain === shop);
 
