@@ -4,7 +4,7 @@ import {
   Icon,
   IndexTable,
   LegacyStack,
-  TextStyle,
+  Text,
   Thumbnail,
   UnstyledLink,
 } from "@shopify/polaris";
@@ -44,20 +44,20 @@ function SmallScreenCard({
             <LegacyStack vertical={true}>
               <LegacyStack.Item>
                 <p>
-                  <TextStyle variation="strong">
+                  <Text variation="strong">
                     {truncate(title, 35)}
-                  </TextStyle>
+                  </Text>
                 </p>
                 <p>{truncate(product?.title, 35)}</p>
                 <p>{dayjs(createdAt).format("MMMM D, YYYY")}</p>
               </LegacyStack.Item>
               <div style={{ display: "flex" }}>
                 <div style={{ flex: "3" }}>
-                  <TextStyle variation="subdued">Discount</TextStyle>
+                  <Text variation="subdued">Discount</Text>
                   <p>{discountCode || "-"}</p>
                 </div>
                 <div style={{ flex: "2" }}>
-                  <TextStyle variation="subdued">Scans</TextStyle>
+                  <Text variation="subdued">Scans</Text>
                   <p>{scans}</p>
                 </div>
               </div>
@@ -117,9 +117,9 @@ export function QRCodeIndex({ QRCodes, loading }) {
               {deletedProduct && (
                 <Icon source={DiamondAlertMajor} color="critical" />
               )}
-              <TextStyle variation={deletedProduct ? "negative" : null}>
+              <Text variation={deletedProduct ? "negative" : null}>
                 {truncate(product?.title, 25)}
-              </TextStyle>
+              </Text>
             </LegacyStack>
           </IndexTable.Cell>
           <IndexTable.Cell>{discountCode}</IndexTable.Cell>

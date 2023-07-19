@@ -59,6 +59,20 @@ export const ShopInfoDB = {
 
     return results;
   },
+
+  update: async function (id, { _id }) {
+    await this.ready;
+
+    const query = { _id: new ObjectId(id) };
+    const updateDocument = {
+      $set: {
+        _id,
+      },
+    };
+
+    await this.shopInfoCollection.updateOne(query, updateDocument);
+    return true;
+  },
 };
 
 export const QRCodesDB = {

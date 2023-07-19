@@ -128,7 +128,7 @@ export async function formatQrCodeResponse(req, res, rawCodeData) {
       Use mock data so that the frontend knows how to interpret this QR Code.
     */
     if (discountDeleted) {
-      QRCodesDB.update(qrCode.id, {
+      QRCodesDB.update(qrCode._id, {
         ...qrCode,
         discountId: "",
         discountCode: "",

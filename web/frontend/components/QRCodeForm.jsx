@@ -126,7 +126,6 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
   const QRCodeURL = QRCode
     ? new URL(`/qrcodes/${QRCode._id}/image`, location.toString()).toString()
     : null;
-  console.log("QRCodeURL ", QRCodeURL);
   /*
     This function is called with the selected product whenever the user clicks "Add" in the ResourcePicker.
 
