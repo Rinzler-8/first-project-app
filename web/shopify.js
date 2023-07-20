@@ -19,7 +19,10 @@ const shopify = shopifyApp({
     path: "/api/webhooks",
     // Register the "app/uninstalled" webhook
   },
-  sessionStorage: new MongoDBSessionStorage("mongodb://localhost:27017"),
+  sessionStorage: new MongoDBSessionStorage(
+    "mongodb://localhost:27017/",
+    "qr_db"
+  ),
 });
 // shopify.api.session.getCurrentId
 export default shopify;
