@@ -33,7 +33,7 @@ export const ShopInfoDB = {
   shopInfoTableName: "shop_info",
   shopInfoCollection: connect.shopInfoCollection,
 
-  create: async function ({ shopDomain, name, country, phone, owner }) {
+  create: async function ({ shopDomain, name, country, phone, owner, deleted }) {
     await this.ready;
 
     const document = {
@@ -42,6 +42,7 @@ export const ShopInfoDB = {
       country,
       phone,
       owner,
+      deleted
     };
 
     const result = await this.shopInfoCollection.insertOne(document);
@@ -56,6 +57,14 @@ export const ShopInfoDB = {
 
     return shop;
   },
+  readDomain: async function (shopDomain) {
+    await this.ready;
+
+    const query = { shopDomain };
+    const shop = await this.shopInfoCollection.findOne(query);
+
+    return shop;
+  },
 
   list: async function () {
     await this.ready;
@@ -64,7 +73,7 @@ export const ShopInfoDB = {
     return results;
   },
 
-  update: async function (id, { shopDomain, name, country, phone, owner }) {
+  update: async function (id, { shopDomain, name, country, phone, owner,deleted }) {
     await this.ready;
 
     const query = { _id: new ObjectId(id) };
@@ -75,6 +84,7 @@ export const ShopInfoDB = {
         country,
         phone,
         owner,
+        deleted
       },
     };
 
@@ -258,11 +268,11 @@ export const QRCodesDB = {
   },
 
   __increaseScanCount: async function (qrcode) {
-    const query = { _id: ObjectId(qrcode._id) };
+    const query = { _id: new ObjectId(qrcode._id) };
     const updateDocument = {
       $inc: { scans: 1 },
     };
-    await this.db.updateOne(query, updateDocument);
+    await this.qrCodesCollection.updateOne(query, updateDocument);
   },
 
   __goToProductView: function (url, qrcode) {

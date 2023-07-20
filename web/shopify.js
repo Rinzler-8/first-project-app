@@ -21,5 +21,5 @@ const shopify = shopifyApp({
   },
   sessionStorage: new MongoDBSessionStorage("mongodb://localhost:27017"),
 });
-
+// shopify.api.session.getCurrentId
 export default shopify;

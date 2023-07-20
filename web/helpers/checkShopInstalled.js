@@ -1,14 +1,11 @@
 import { ShopInfoDB } from "../qr-codes-db.js";
-import { MongoDBSessionStorage } from "@shopify/shopify-app-session-storage-mongodb";
 import shopify from "../shopify.js";
 
 export const checkShopInstalled = async (req, res, next) => {
   try {
     const shop = req.query.shop;
     const shops = await ShopInfoDB.list();
-    const DB_PATH = `mongodb://localhost:27017`;
-    const mongoDBSessionStorage = new MongoDBSessionStorage(DB_PATH);
-    const session = await mongoDBSessionStorage.findSessionsByShop(shop);
+    const session = await shopify.config.sessionStorage.findSessionsByShop(shop);
 
     if (!session[0]) {
       throw new Error("Shop session not found.");
@@ -26,11 +23,15 @@ export const checkShopInstalled = async (req, res, next) => {
       owner,
       country,
       phone,
+      deleted: false,
     };
 
-    const shopExists = shops.find((item) => item.shopDomain === shop);
+    const shopExists = await ShopInfoDB.readDomain(shop);
+    //count
 
-    if (!shopExists) {
+    const exists = shops.some((item) => item.shopDomain === shop);
+
+    if (!exists) {
       await ShopInfoDB.create(shopInfo);
     } else {
       await ShopInfoDB.update(shopExists._id, shopInfo);

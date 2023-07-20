@@ -11,7 +11,7 @@ import {
   Thumbnail,
   Icon,
   LegacyStack,
-  TextStyle,
+  Text,
   Layout,
   EmptyState,
 } from "@shopify/polaris";
@@ -323,9 +323,9 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                           size="small"
                         />
                       )}
-                      <TextStyle variation="strong">
+                      <Text variation="strong">
                         {selectedProduct.title}
-                      </TextStyle>
+                      </Text>
                     </LegacyStack>
                   ) : (
                     <LegacyStack vertical spacing="extraTight">
@@ -335,9 +335,9 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                       {productId.error && (
                         <LegacyStack spacing="tight">
                           <Icon source={AlertMinor} color="critical" />
-                          <TextStyle variation="negative">
+                          <Text variation="negative">
                             {productId.error}
-                          </TextStyle>
+                          </Text>
                         </LegacyStack>
                       )}
                     </LegacyStack>

@@ -7,7 +7,6 @@ export default async function redirectToAuth(req, res, app) {
   }
 
   if (shopify.context.isEmbeddedApp(req.query.host)) {
-    console.log("APP EMBEDDED OR NOT ???", req.query.embedded);
     return clientSideRedirect(req, res);
   }
 
