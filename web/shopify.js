@@ -4,7 +4,6 @@ import { restResources } from "@shopify/shopify-api/rest/admin/2023-07";
 import { MongoDBSessionStorage } from "@shopify/shopify-app-session-storage-mongodb";
 import { QRCodesDB } from "./qr-codes-db.js";
 
-QRCodesDB.init();
 const shopify = shopifyApp({
   api: {
     apiKey: "47d82d2e6027eebe39ad9bc6ce901190",
@@ -18,6 +17,7 @@ const shopify = shopifyApp({
   },
   webhooks: {
     path: "/api/webhooks",
+    // Register the "app/uninstalled" webhook
   },
   sessionStorage: new MongoDBSessionStorage("mongodb://localhost:27017"),
 });

@@ -4,8 +4,9 @@ import shopify from "../shopify.js";
 export const checkShopInstalled = async (req, res, next) => {
   try {
     const shop = req.query.shop;
-    const shops = await ShopInfoDB.list();
-    const session = await shopify.config.sessionStorage.findSessionsByShop(shop);
+    const session = await shopify.config.sessionStorage.findSessionsByShop(
+      shop
+    );
 
     if (!session[0]) {
       throw new Error("Shop session not found.");
@@ -28,13 +29,10 @@ export const checkShopInstalled = async (req, res, next) => {
 
     const shopExists = await ShopInfoDB.readDomain(shop);
     //count
-
-    const exists = shops.some((item) => item.shopDomain === shop);
-
-    if (!exists) {
+    if (!shopExists) {
       await ShopInfoDB.create(shopInfo);
     } else {
-      await ShopInfoDB.update(shopExists._id, shopInfo);
+      await ShopInfoDB.update(shop, shopInfo);
     }
 
     await next();

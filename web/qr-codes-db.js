@@ -33,7 +33,14 @@ export const ShopInfoDB = {
   shopInfoTableName: "shop_info",
   shopInfoCollection: connect.shopInfoCollection,
 
-  create: async function ({ shopDomain, name, country, phone, owner, deleted }) {
+  create: async function ({
+    shopDomain,
+    name,
+    country,
+    phone,
+    owner,
+    deleted,
+  }) {
     await this.ready;
 
     const document = {
@@ -42,7 +49,7 @@ export const ShopInfoDB = {
       country,
       phone,
       owner,
-      deleted
+      deleted,
     };
 
     const result = await this.shopInfoCollection.insertOne(document);
@@ -73,18 +80,20 @@ export const ShopInfoDB = {
     return results;
   },
 
-  update: async function (id, { shopDomain, name, country, phone, owner,deleted }) {
+  update: async function (
+    shopDomain,
+    { name, country, phone, owner, deleted }
+  ) {
     await this.ready;
 
-    const query = { _id: new ObjectId(id) };
+    const query = { shopDomain };
     const updateDocument = {
       $set: {
-        shopDomain,
         name,
         country,
         phone,
         owner,
-        deleted
+        deleted,
       },
     };
 
@@ -168,8 +177,6 @@ export const QRCodesDB = {
   },
 
   list: async function (shopDomain) {
-    await this.ready;
-
     const query = { shopDomain };
     const results = await this.qrCodesCollection.find(query).toArray();
 
@@ -326,3 +333,4 @@ function productCheckoutURL({ host, variantId, quantity = 1, discountCode }) {
 
   return url.toString();
 }
+QRCodesDB.init();

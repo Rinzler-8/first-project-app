@@ -323,9 +323,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                           size="small"
                         />
                       )}
-                      <Text variation="strong">
-                        {selectedProduct.title}
-                      </Text>
+                      <Text variation="strong">{selectedProduct.title}</Text>
                     </LegacyStack>
                   ) : (
                     <LegacyStack vertical spacing="extraTight">
@@ -335,9 +333,7 @@ export function QRCodeForm({ QRCode: InitialQRCode }) {
                       {productId.error && (
                         <LegacyStack spacing="tight">
                           <Icon source={AlertMinor} color="critical" />
-                          <Text variation="negative">
-                            {productId.error}
-                          </Text>
+                          <Text variation="negative">{productId.error}</Text>
                         </LegacyStack>
                       )}
                     </LegacyStack>
